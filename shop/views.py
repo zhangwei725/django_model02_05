@@ -74,8 +74,7 @@ def find1(request):
         print(info.title)
         print(info.groupdetail.description)
     return HttpResponse('通过主表查询')
-#
-#
+
 # class Person:
 #     def __init__(self, detail, addresses):
 #         # 一对一
