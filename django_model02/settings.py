@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'shop',
+    'other',
 ]
 
 MIDDLEWARE = [
@@ -73,16 +74,15 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+# 北京
+LANGUAGE_CODE = 'zh-hans'
+# 修改成中国上海的时区
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
 USE_L10N = True
-
-USE_TZ = True
-
+# 修改成False
+USE_TZ = False
 
 STATIC_URL = '/static/'

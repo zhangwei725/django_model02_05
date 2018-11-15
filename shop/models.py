@@ -19,6 +19,9 @@ class GroupInfo(models.Model):
     class Meta:
         db_table = 'group_info'
 
+    def __str__(self):
+        return self.info_id
+
 
 class GroupDetail(models.Model):
     detail_id = models.AutoField(primary_key=True)
@@ -45,6 +48,11 @@ class GroupDetail(models.Model):
         db_table = "group_detail"
 
 
+#  ==============一对多==============
+
+# 主表的一条记录对应子表的多条记录
+#
+
 class User(models.Model):
     uid = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64)
@@ -56,7 +64,44 @@ class User(models.Model):
 class Address(models.Model):
     aid = models.AutoField(primary_key=True)
     desc = models.CharField(max_length=255)
-    user = models.ForeignKey('User', on_delete=models.DO_NOTHING)
+    # address_set
+    user = models.ForeignKey('User', on_delete=models.DO_NOTHING, related_name='addresses')
 
     class Meta:
         db_table = 'address'
+        # default_related_name
+
+
+# 多对多
+#  权限   增 删 改 查
+#  角色  超级管理员 管理员  普通用户
+
+class Per(models.Model):
+    per_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=30)
+    desc = models.CharField(max_length=100)
+    is_delete = models.BooleanField(default=0)
+    create_date = models.DateTimeField(auto_now_add=True)
+    roles = models.ManyToManyField('Role')
+
+    # roles = models.ManyToManyField('Role', through='RolePerRelation', through_fields=['role', 'per'])
+
+    class Meta:
+        db_table = 'per'
+
+
+class Role(models.Model):
+    role_id = models.AutoField(primary_key=True)
+    # 角色的名称
+    name = models.CharField(max_length=30)
+    # 角色说明
+    desc = models.CharField(max_length=100)
+    is_delete = models.BooleanField(default=0)
+    create_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'role'
+
+# class RolePerRelation(models.Model):
+#     role = models.ForeignKey('Role', on_delete=models.DO_NOTHING)
+#     per = models.ForeignKey('Per', on_delete=models.DO_NOTHING)

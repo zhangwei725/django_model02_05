@@ -20,7 +20,7 @@ def add(request):
     """
     # 主表id
     # 保存主表数据
-    info = GroupInfo(title='小甜甜2号', img='/img/xxx.png', current_price=99.00, original_price=998.00, count=50,
+    info = GroupInfo(title='小甜甜3号', img='/img/xxx.png', current_price=99.00, original_price=998.00, count=50,
                      is_delete=False)
     info.save()
     # 子表外键字段 可以设置对象,也可以设置主键
@@ -75,6 +75,7 @@ def find1(request):
         print(info.groupdetail.description)
     return HttpResponse('通过主表查询')
 
+
 # class Person:
 #     def __init__(self, detail, addresses):
 #         # 一对一
@@ -100,3 +101,100 @@ def find1(request):
 #
 #     for address in p.addresses:
 #         print(address.name)
+
+def fk_add(request):
+    user = User(name='娇娇')
+    user.save()
+    li = [Address(desc=f'武汉市高新区金融港智慧园{i}', user_id=user.uid) for i in range(10)]
+    # 批量添加
+    Address.objects.bulk_create(li)
+    return HttpResponse('一对多添加')
+
+
+"""
+查询
+正向查询  正向查询的时候跟一对一样
+反向查询
+
+"""
+
+"""
+[
+{
+name:小明
+addresses:[address]
+},
+{
+name:娇娇
+addresses:[address,address]
+},
+{
+name:娟娟
+addresses:[address,address]
+},
+
+]
+
+"""
+
+
+# 一对一的情况 主表对象.类名小写
+def fk_find(request):
+    # user = User.objects.get(uid=1)
+    # 在一对多通过一的一方查询多的一方的时候 可以通过主表对象.子表类小写_set
+    # SELECT  * FROM  ADDRESS  WHERE USER_ID = 1
+    # 推荐使用
+    # address_list = user.addresses.all()
+    # Address.objects.filter(user_id=1)
+    # 动态  可以动态的添加属性
+    users = User.objects.all()
+    for user in users:
+        li = user.addresses.all()
+        user.addr_list = li
+    return render(request, 'users.html', context={'users': users})
+
+
+def many_to_many(request):
+    # 保存角色
+    # adm = Role(name='admin', desc='超级管理员')
+    # nor = Role(name='nor', desc='普通用户')
+    # adm.save()
+    # nor.save()
+
+    # 增删改查的四个权限
+    # add = Per(name='add')
+    # select = Per(name='select')
+    # update = Per(name='update')
+    # delete = Per(name='delete')
+    # all = [add, select, update, delete]
+    # Per.objects.bulk_create(all)
+
+    # 给角色添加多个权限
+
+    # per_list = Per.objects.all()
+    #
+    # role = Role.objects.filter(name='admin')[0]
+    # role.per_set.add(*per_list)
+    # role.save()
+
+    # 给角色添加单个全选
+
+    select = Per.objects.get(name='select')
+
+    nor = Role.objects.get(name='nor')
+    nor.per_set.add(select)
+    nor.save()
+    return HttpResponse('呵呵')
+
+
+# 'delete'
+
+def delete(request):
+    nor = Role.objects.get(name='admin')
+    pers = nor.per_set.all()
+    for per in pers:
+        if per.name == 'delete':
+            User.objects.get(uid=1).delete()
+            return HttpResponse('删除成功')
+    else:
+        return HttpResponse('你权限都没有,删个毛线!!!!')
