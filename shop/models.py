@@ -51,11 +51,22 @@ class GroupDetail(models.Model):
 #  ==============一对多==============
 
 # 主表的一条记录对应子表的多条记录
-#
+# .all()
+class UserManager(models.Manager):
+    def all(self):
+        return super().all().filter(is_delete=False)
+
+    def add_guest(self, *kwarg):
+        user = User(kwarg, is_delete=True)
+        user.save()
+        return user
+
 
 class User(models.Model):
     uid = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64)
+    is_delete = models.BooleanField(default=False)
+    test = UserManager()
 
     class Meta:
         db_table = 'user'
@@ -75,6 +86,7 @@ class Address(models.Model):
 # 多对多
 #  权限   增 删 改 查
 #  角色  超级管理员 管理员  普通用户
+
 
 class Per(models.Model):
     per_id = models.AutoField(primary_key=True)
